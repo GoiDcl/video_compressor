@@ -43,5 +43,5 @@ deploy:
   environment:
     name: production
     url: http://192.168.0.123
-    only:
-      - main
+  only:
+    - main
