@@ -4,11 +4,10 @@ import uuid
 from logging.handlers import RotatingFileHandler
 
 import requests
-from django.utils import timezone as dt
 from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
 
-from .decoder import decode_base64_to_file, encode_file_to_base64
+from .decoder import encode_file_to_base64
 from .processing import compress_video
 from .serializers import VideoCompressorSerializer
 
@@ -148,7 +147,7 @@ class VideoCompressorViewSet(CreateViewSet):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
     """
-    на случай если всё же придётся декодировать из base64 
+    на случай если всё же придётся декодировать из base64
 
     def perform_create(self, serializer):
         if serializer.is_valid():
