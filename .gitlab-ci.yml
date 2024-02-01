@@ -20,6 +20,8 @@ tests:
 
 build_and_push:
   image: docker:stable
+  services:
+    - docker:dind
   stage: publish
   script:
     - docker system prune -a -f
@@ -43,6 +45,6 @@ deploy:
 
   environment:
     name: production
-    url: http://192.168.0.123
+    url: http://192.168.0.130
   only:
     - main
