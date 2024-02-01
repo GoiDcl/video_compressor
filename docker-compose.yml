@@ -1,0 +1,15 @@
+version: '3'
+
+volumes:
+  static:
+
+services:
+  overflow:
+    build: .
+    ports:
+      - "8888:8888"
+    env_file: .env
+    volumes:
+      - static:/static
+    command: >
+      sh -c "python manage.py runserver 0:8888"
