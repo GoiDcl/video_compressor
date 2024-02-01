@@ -1,0 +1,47 @@
+stages:
+  - tests
+  - publish
+  - deploy
+
+variables:
+  IMAGE_NAME: registry.krasrm.com/shaleinikove/video_compressor
+
+tests:
+  image: python:3.11-slim
+  stage: tests
+  needs: []
+  script:
+    - echo "Install dependencies"
+    - python -m pip install --upgrade pip
+    - pip install flake8==6.0.0 flake8-isort==6.0.0
+    - pip install -r requirements.txt
+    - echo "Test with flake8"
+    - python -m flake8 compressor/
+
+build_and_push:
+  image: docker:stable
+  stage: publish
+  script:
+    - docker system prune -a -f
+    - docker build -t $IMAGE_NAME .
+    - docker login registry.krasrm.com -u $REGISTRY_USER -p $REGISTRY_TOKEN
+    - docker push $IMAGE_NAME
+  only:
+    - main
+
+deploy:
+  image: ubuntu
+  stage: deploy
+  script:
+    - chmod og= $SSH_KEY
+    - apt-get update && apt-get install openssh-client -y
+    - ssh -i $SSH_KEY -o StrictHostKeyChecking=no $USER@$HOST docker login registry.krasrm.com -u $REGISTRY_USER -p $REGISTRY_TOKEN
+    - ssh -i $SSH_KEY -o StrictHostKeyChecking=no $USER@$HOST docker-compose -f projects/video_compressor/docker-compose.production.yml pull
+    - ssh -i $SSH_KEY -o StrictHostKeyChecking=no $USER@$HOST docker-compose -f projects/video_compressor/docker-compose.production.yml down
+    - ssh -i $SSH_KEY -o StrictHostKeyChecking=no $USER@$HOST docker-compose -f projects/video_compressor/docker-compose.production.yml up -d
+
+  environment:
+    name: production
+    url: http://192.168.0.123
+    only:
+      - main

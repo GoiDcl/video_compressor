@@ -7,9 +7,9 @@ services:
   overflow:
     build: .
     ports:
-      - "8888:8888"
+      - "8000:8000"
     env_file: .env
     volumes:
       - static:/static
     command: >
-      sh -c "python manage.py runserver 0:8888"
+      sh -c "python manage.py runserver 0:8000"
