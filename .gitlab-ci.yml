@@ -25,6 +25,7 @@ build_and_push:
   stage: publish
   script:
     - docker system prune -a -f
+    - ls -la
     - docker build -t registry.krasrm.com/shaleinikove/video_compressor .
     - docker login registry.krasrm.com -u $REGISTRY_USER -p $REGISTRY_TOKEN
     - docker push $IMAGE_NAME
