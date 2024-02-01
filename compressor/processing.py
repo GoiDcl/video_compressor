@@ -1,5 +1,5 @@
-import subprocess
 import os
+import subprocess
 
 
 def compress_video(input_file, logger, target_size=10, byte=8):

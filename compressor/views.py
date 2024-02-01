@@ -3,16 +3,14 @@ import os
 import uuid
 from logging.handlers import RotatingFileHandler
 
-from rest_framework.response import Response
-from rest_framework import status
-
 import requests
 from django.utils import timezone as dt
-from rest_framework import mixins, viewsets
+from rest_framework import mixins, status, viewsets
+from rest_framework.response import Response
 
-from .serializers import VideoCompressorSerializer
-from .processing import compress_video
 from .decoder import decode_base64_to_file, encode_file_to_base64
+from .processing import compress_video
+from .serializers import VideoCompressorSerializer
 
 
 def setup_logger(name, log_file, level=logging.DEBUG):
