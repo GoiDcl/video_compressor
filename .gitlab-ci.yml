@@ -36,9 +36,9 @@ deploy:
     - chmod og= $SSH_KEY
     - apt-get update && apt-get install openssh-client -y
     - ssh -i $SSH_KEY -o StrictHostKeyChecking=no $USER@$HOST docker login registry.krasrm.com -u $REGISTRY_USER -p $REGISTRY_TOKEN
-    - ssh -i $SSH_KEY -o StrictHostKeyChecking=no $USER@$HOST docker-compose -f projects/video_compressor/docker-compose.production.yml pull
-    - ssh -i $SSH_KEY -o StrictHostKeyChecking=no $USER@$HOST docker-compose -f projects/video_compressor/docker-compose.production.yml down
-    - ssh -i $SSH_KEY -o StrictHostKeyChecking=no $USER@$HOST docker-compose -f projects/video_compressor/docker-compose.production.yml up -d
+    - ssh -i $SSH_KEY -o StrictHostKeyChecking=no $USER@$HOST docker-compose -f video_compressor/docker-compose.production.yml pull
+    - ssh -i $SSH_KEY -o StrictHostKeyChecking=no $USER@$HOST docker-compose -f video_compressor/docker-compose.production.yml down
+    - ssh -i $SSH_KEY -o StrictHostKeyChecking=no $USER@$HOST docker-compose -f video_compressor/docker-compose.production.yml up -d
     - echo test
 
   environment:
