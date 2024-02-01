@@ -20,8 +20,6 @@ tests:
 
 build_and_push:
   image: docker:stable
-  services:
-    - docker:dind
   stage: publish
   script:
     - docker system prune -a -f
