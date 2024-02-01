@@ -23,8 +23,8 @@ build_and_push:
   stage: publish
   script:
     - docker system prune -a -f
-    - docker login registry.krasrm.com -u $REGISTRY_USER -p $REGISTRY_TOKEN
     - docker build -t $IMAGE_NAME .
+    - docker login registry.krasrm.com -u $REGISTRY_USER -p $REGISTRY_TOKEN
     - docker push $IMAGE_NAME
   only:
     - main
