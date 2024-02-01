@@ -1,4 +1,4 @@
-FROM python3.11-slim-bookworm
+FROM python3.11-slim
 
 WORKDIR /compressor
 
