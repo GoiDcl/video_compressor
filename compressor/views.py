@@ -77,11 +77,11 @@ class VideoCompressorViewSet(CreateViewSet):
     0. Получаем файл
     1. Сериализатор проверяет валидность полученных данных и в случае
         вознкновения ошибок возвращает ошибки и 400 статус код
-    2. Сохраняем оригинал перед сжатием
-    3. Отправляем файл в функцию для сжатия
-    4.1 В случае успеха отдаём оригинал и сжатый файл в 1с,
-        оповещаем об успехе
-    4.2 Если сжатие не удалось оповещаем о неудаче
+    2. Отправляем файл в функцию для сжатия
+    3.1 В случае успеха кодируем файлы в base64
+    3.1.1 Создаём ключи для передачи файлов в 1с
+    3.1.2 Отправляем оригинал и сжатый файл в 1с, оповещаем об успехе
+    3.2 Если сжатие не удалось оповещаем о неудаче
     """
 
     serializer_class = VideoCompressorSerializer
@@ -97,44 +97,54 @@ class VideoCompressorViewSet(CreateViewSet):
             compressed_file = compress_video(input_file.name, logger)
 
             if compressed_file:
-                encoded_orig_file = encode_file_to_base64(
-                    input_file.name, logger
+                logger.debug(
+                    "Сжатие файла прошло успешно. "
+                    "Кодирую файлы в base64 и создаю ключи..."
                 )
-                encoded_demo_file = encode_file_to_base64(
-                    compressed_file.name, logger
-                )
-                orig_key = str(uuid.uuid4())
-                demo_key = str(uuid.uuid4())
-                try:
-                    logger.debug(
-                        "Сжатие файла прошло успешно. "
-                        "Пытаюсь отправить файлы в 1с..."
-                    )
-                    url = URL_1C
-                    data = {
-                        "Данные": encoded_orig_file,
-                        "Ключ": orig_key,
-                        "Пакет": 1,
-                        "ПоследнийПакет": 1
-                    }
-                    r = requests.post(url, json=data)
-                    logger.debug(
-                        "Запрос на отправку файла успешно создан!\n"
-                        "Ответ: {} {}".format(r.status_code, r.reason)
-                    )
-                    data = {
-                        "Данные": encoded_demo_file,
-                        "Ключ": demo_key,
-                        "Пакет": 1,
-                        "ПоследнийПакет": 1
-                    }
-                    r = requests.post(url, json=data)
-                    logger.debug(
-                        "Запрос на отправку файла успешно создан!\n"
-                        "Ответ: {} {}".format(r.status_code, r.reason)
-                    )
-                except Exception as e:
-                    logger.error(e)
+                # encoded_orig_file = encode_file_to_base64(
+                #     input_file.name, logger
+                # )
+                # encoded_demo_file = encode_file_to_base64(
+                #     compressed_file.name, logger
+                # )
+                # orig_key = str(uuid.uuid4())
+                # demo_key = str(uuid.uuid4())
+                # if encoded_demo_file:
+                #     logger.debug(
+                #         "Кодирование прошло успешно!"
+                #     )
+                #     try:
+                #         logger.debug(
+                #             "Отправляю файлы в 1с..."
+                #         )
+                #         url = URL_1C
+                #         data = {
+                #             "Данные": encoded_orig_file,
+                #             "Ключ": orig_key,
+                #             "Пакет": 1,
+                #             "ПоследнийПакет": 1
+                #         }
+                #         r = requests.post(url, json=data)
+                #         logger.debug(
+                #             "Запрос на отправку файла успешно создан!\n"
+                #             "Ответ: {} {}".format(r.status_code, r.reason)
+                #         )
+                #         data = {
+                #             "Данные": encoded_demo_file,
+                #             "Ключ": demo_key,
+                #             "Пакет": 1,
+                #             "ПоследнийПакет": 1
+                #         }
+                #         r = requests.post(url, json=data)
+                #         logger.debug(
+                #             "Запрос на отправку файла успешно создан!\n"
+                #             "Ответ: {} {}".format(r.status_code, r.reason)
+                #         )
+                #         return Response(
+                #             status=status.HTTP_200_OK
+                #         )
+                #     except Exception as e:
+                #         logger.error(e)
             else:
                 logger.error("Сжатие файла не удалось.")
                 return Response(

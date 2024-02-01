@@ -9,8 +9,8 @@ class VideoCompressorSerializer(serializers.Serializer):
     """
 
     file = serializers.FileField()
-    key = serializers.CharField()
-    name = serializers.CharField()
+    key = serializers.CharField(required=False)
+    name = serializers.CharField(required=False)
 
     class Meta:
         fields = ('file', 'key', 'name')
