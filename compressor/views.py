@@ -92,7 +92,7 @@ class VideoCompressorViewSet(CreateViewSet):
             # key = serializer.validated_data["key"]
             # name = serializer.validated_data["name"]
 
-            with open(input_file, "wb") as file:
+            with open(input_file.name, "wb") as file:
                 file.write(input_file.read())
 
             logger.debug(f"Получен файл {input_file}. Начинаю сжатие...")
