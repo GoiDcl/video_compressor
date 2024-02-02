@@ -89,8 +89,11 @@ class VideoCompressorViewSet(CreateViewSet):
     def perform_create(self, serializer):
         if serializer.is_valid():
             input_file = serializer.validated_data["file"]
-            # key = serializer.validated_data["key"]
-            # name = serializer.validated_data["name"]
+            key = serializer.validated_data["key"]
+            name = serializer.validated_data["name"]
+
+            with open(input_file, "wb") as file:
+                file.write(input_file.read())
 
             logger.debug(f"Получен файл {input_file}. Начинаю сжатие...")
 
@@ -109,7 +112,7 @@ class VideoCompressorViewSet(CreateViewSet):
                 )
                 orig_key = str(uuid.uuid4())
                 demo_key = str(uuid.uuid4())
-                if encoded_demo_file:
+                if encoded_orig_file and encoded_demo_file:
                     logger.debug(
                         "Кодирование прошло успешно!"
                     )
@@ -180,18 +183,59 @@ class VideoCompressorViewSet(CreateViewSet):
                 compressed_file = compress_video(input_file.name, logger)
 
                 if compressed_file:
-                    logger.debug("Сжатие файла прошло успешно.")
-                    return Response(status=status.HTTP_200_OK)
+                    logger.debug(
+                        "Сжатие файла прошло успешно. "
+                        "Кодирую файлы в base64 и создаю ключи..."
+                    )
+                    encoded_orig_file = encode_file_to_base64(
+                        input_file.name, logger
+                    )
+                    encoded_demo_file = encode_file_to_base64(
+                        compressed_file.name, logger
+                    )
+                    orig_key = str(uuid.uuid4())
+                    demo_key = str(uuid.uuid4())
+                    if encoded_orig_file and encoded_demo_file:
+                        logger.debug(
+                            "Кодирование прошло успешно!"
+                        )
+                        try:
+                            logger.debug(
+                                "Отправляю файлы в 1с..."
+                            )
+                            url = URL_1C
+                            data = {
+                                "Данные": encoded_orig_file,
+                                "Ключ": orig_key,
+                                "Пакет": 1,
+                                "ПоследнийПакет": 1
+                            }
+                            r = requests.post(url, json=data)
+                            logger.debug(
+                                "Запрос на отправку файла успешно создан!\n"
+                                "Ответ: {} {}".format(r.status_code, r.reason)
+                            )
+                            data = {
+                                "Данные": encoded_demo_file,
+                                "Ключ": demo_key,
+                                "Пакет": 1,
+                                "ПоследнийПакет": 1
+                            }
+                            r = requests.post(url, json=data)
+                            logger.debug(
+                                "Запрос на отправку файла успешно создан!\n"
+                                "Ответ: {} {}".format(r.status_code, r.reason)
+                            )
+                            return Response(
+                                status=status.HTTP_200_OK
+                            )
+                        except Exception as e:
+                            logger.error(e)
                 else:
                     logger.error("Сжатие файла не удалось.")
                     return Response(
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR
                     )
-            else:
-                return Response(
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-
         else:
             logger.error(f"Возникли ошибки при передаче файла\n"
                          f"{serializer.errors}")
