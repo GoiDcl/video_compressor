@@ -89,8 +89,8 @@ class VideoCompressorViewSet(CreateViewSet):
     def perform_create(self, serializer):
         if serializer.is_valid():
             input_file = serializer.validated_data["file"]
-            key = serializer.validated_data["key"]
-            name = serializer.validated_data["name"]
+            # key = serializer.validated_data["key"]
+            # name = serializer.validated_data["name"]
 
             with open(input_file, "wb") as file:
                 file.write(input_file.read())
