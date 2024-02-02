@@ -108,7 +108,7 @@ class VideoCompressorViewSet(CreateViewSet):
                     input_file.name, logger
                 )
                 encoded_demo_file = encode_file_to_base64(
-                    compressed_file.name, logger
+                    compressed_file, logger
                 )
                 orig_key = str(uuid.uuid4())
                 demo_key = str(uuid.uuid4())
