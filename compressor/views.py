@@ -89,7 +89,7 @@ class VideoCompressorViewSet(CreateViewSet):
     def perform_create(self, serializer):
         if serializer.is_valid():
             input_file = serializer.validated_data["file"]
-            # key = serializer.validated_data["key"]
+            key = serializer.validated_data["key"]
             # name = serializer.validated_data["name"]
 
             with open(input_file.name, "wb") as file:
@@ -121,13 +121,14 @@ class VideoCompressorViewSet(CreateViewSet):
                             "Отправляю файлы в 1с..."
                         )
                         url = URL_1C
+                        headers = {"XRMCCookie": key}
                         data = {
                             "Данные": encoded_orig_file,
                             "Ключ": orig_key,
                             "Пакет": 1,
                             "ПоследнийПакет": 1
                         }
-                        r = requests.post(url, json=data)
+                        r = requests.post(url, json=data, headers=headers)
                         logger.debug(
                             "Запрос на отправку файла успешно создан!\n"
                             "Ответ: {} {}".format(r.status_code, r.reason)
