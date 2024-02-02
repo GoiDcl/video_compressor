@@ -6,7 +6,7 @@ COPY . .
 
 RUN python -m pip install --upgrade pip && \
     pip install -r requirements.txt && \
-    apt update && apt-get install ffmpeg
+    apt update -y && apt-get install ffmpeg -y
 
 
 
