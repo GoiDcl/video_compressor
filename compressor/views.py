@@ -139,7 +139,7 @@ class VideoCompressorViewSet(CreateViewSet):
                             "Пакет": 1,
                             "ПоследнийПакет": 1
                         }
-                        r = requests.post(url, json=data)
+                        r = requests.post(url, json=data, headers=headers)
                         logger.debug(
                             "Запрос на отправку файла успешно создан!\n"
                             "Ответ: {} {}".format(r.status_code, r.reason)
@@ -167,7 +167,7 @@ class VideoCompressorViewSet(CreateViewSet):
         if serializer.is_valid():
             encoded_file = serializer.validated_data["file"]
             key = serializer.validated_data["key"]
-            name = serializer.validated_data["name"]
+            cookie = serializer.validated_data["cookie"]
 
             logger.debug(f"Получен файл {name}. Начинаю декодирование...")
 
@@ -194,8 +194,8 @@ class VideoCompressorViewSet(CreateViewSet):
                     encoded_demo_file = encode_file_to_base64(
                         compressed_file.name, logger
                     )
-                    orig_key = str(uuid.uuid4())
-                    demo_key = str(uuid.uuid4())
+                    # orig_key = str(uuid.uuid4())
+                    # demo_key = str(uuid.uuid4())
                     if encoded_orig_file and encoded_demo_file:
                         logger.debug(
                             "Кодирование прошло успешно!"
@@ -205,24 +205,25 @@ class VideoCompressorViewSet(CreateViewSet):
                                 "Отправляю файлы в 1с..."
                             )
                             url = URL_1C
+                            headers = {"XRMCCookie": cookie}
                             data = {
                                 "Данные": encoded_orig_file,
-                                "Ключ": orig_key,
+                                "Ключ": key,
                                 "Пакет": 1,
                                 "ПоследнийПакет": 1
                             }
-                            r = requests.post(url, json=data)
+                            r = requests.post(url, json=data, headers=headers)
                             logger.debug(
                                 "Запрос на отправку файла успешно создан!\n"
                                 "Ответ: {} {}".format(r.status_code, r.reason)
                             )
                             data = {
                                 "Данные": encoded_demo_file,
-                                "Ключ": demo_key,
+                                "Ключ": key,
                                 "Пакет": 1,
                                 "ПоследнийПакет": 1
                             }
-                            r = requests.post(url, json=data)
+                            r = requests.post(url, json=data, headers=headers)
                             logger.debug(
                                 "Запрос на отправку файла успешно создан!\n"
                                 "Ответ: {} {}".format(r.status_code, r.reason)
