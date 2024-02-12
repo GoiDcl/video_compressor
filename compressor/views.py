@@ -1,6 +1,6 @@
 import logging
 import os
-import uuid
+# import uuid
 from logging.handlers import RotatingFileHandler
 
 import requests
