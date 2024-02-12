@@ -89,8 +89,8 @@ class VideoCompressorViewSet(CreateViewSet):
     def perform_create(self, serializer):
         if serializer.is_valid():
             input_file = serializer.validated_data["file"]
-            # key = serializer.validated_data["key"]
-            # name = serializer.validated_data["name"]
+            key = serializer.validated_data["key"]
+            cookie = serializer.validated_data["cookie"]
 
             with open(input_file.name, "wb") as file:
                 file.write(input_file.read())
@@ -102,7 +102,7 @@ class VideoCompressorViewSet(CreateViewSet):
             if compressed_file:
                 logger.debug(
                     "Сжатие файла прошло успешно. "
-                    "Кодирую файлы в base64 и создаю ключи..."
+                    "Кодирую файлы в base64..."
                 )
                 encoded_orig_file = encode_file_to_base64(
                     input_file.name, logger
@@ -110,8 +110,8 @@ class VideoCompressorViewSet(CreateViewSet):
                 encoded_demo_file = encode_file_to_base64(
                     compressed_file, logger
                 )
-                orig_key = str(uuid.uuid4())
-                demo_key = str(uuid.uuid4())
+                # orig_key = str(uuid.uuid4())
+                # demo_key = str(uuid.uuid4())
                 if encoded_orig_file and encoded_demo_file:
                     logger.debug(
                         "Кодирование прошло успешно!"
@@ -121,11 +121,10 @@ class VideoCompressorViewSet(CreateViewSet):
                             "Отправляю файлы в 1с..."
                         )
                         url = URL_1C
-                        key = os.environ.get("COOKIE")
-                        headers = {"XRMCCookie": key}
+                        headers = {"XRMCCookie": cookie}
                         data = {
                             "Данные": encoded_orig_file,
-                            "Ключ": orig_key,
+                            "Ключ": key,
                             "Пакет": 1,
                             "ПоследнийПакет": 1
                         }
@@ -136,7 +135,7 @@ class VideoCompressorViewSet(CreateViewSet):
                         )
                         data = {
                             "Данные": encoded_demo_file,
-                            "Ключ": demo_key,
+                            "Ключ": key,
                             "Пакет": 1,
                             "ПоследнийПакет": 1
                         }

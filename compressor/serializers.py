@@ -10,7 +10,7 @@ class VideoCompressorSerializer(serializers.Serializer):
 
     file = serializers.FileField()
     key = serializers.CharField(required=False)
-    name = serializers.CharField(required=False)
+    cookie = serializers.CharField(required=False)
 
     class Meta:
         fields = ('file', 'key', 'name')
