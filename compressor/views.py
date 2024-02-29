@@ -100,6 +100,7 @@ class VideoCompressorViewSet(CreateViewSet):
             compressed_file = compress_video(input_file.name, logger)
 
             if compressed_file:
+
                 logger.debug(
                     "Сжатие файла прошло успешно. "
                     "Кодирую файлы в base64..."
@@ -121,7 +122,11 @@ class VideoCompressorViewSet(CreateViewSet):
                             "Отправляю файлы в 1с..."
                         )
                         url = URL_1C
-                        headers = {"XRMCCookie": cookie}
+                        headers = {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'xrmccookie': cookie
+                        }
                         data = {
                             "Данные": encoded_orig_file,
                             "Ключ": key,
