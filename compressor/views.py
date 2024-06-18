@@ -1,6 +1,4 @@
-import logging
 import os
-from logging.handlers import RotatingFileHandler
 
 import requests
 from rest_framework import mixins, status, viewsets
@@ -9,44 +7,7 @@ from rest_framework.response import Response
 from .decoder import encode_file_to_base64
 from .processing import compress_video
 from .serializers import VideoCompressorSerializer
-
-
-def setup_logger(name, log_file, level=logging.DEBUG):
-    """
-    Настройка логгера.
-
-    Параметры
-    ---------
-    formatter
-        настройка вывода инфорамации в лог
-            - levelname: уровень важности
-            - asctime: время регистрации записи
-            - name: название модуля, который создал запись
-            - message: сама запись
-    handler
-        обработчик ротации файлов. если текущее сообщение вот-вот
-        позволит файлу журнала превысить максимальный размер,
-        то обработчик закроет текущий файл и откроет следующий.
-            - maxBytes: максимальный размер лог-файла, 50 Мб
-            - backupCount: количество лог-файлов
-    """
-    BACKUP_COUNT = 5
-    MAX_LOG_WEIGHT = 52428800
-
-    formatter = logging.Formatter(
-        "%(levelname)s - %(asctime)s - %(name)s - %(message)s"
-    )
-    handler = RotatingFileHandler(
-        log_file,
-        maxBytes=MAX_LOG_WEIGHT, backupCount=BACKUP_COUNT
-    )
-    handler.setFormatter(formatter)
-
-    logger = logging.getLogger(name)
-    logger.setLevel(level)
-    logger.addHandler(handler)
-
-    return logger
+from .logger import setup_logger
 
 
 logger = setup_logger("video_compressor", "video_compressor.log")
@@ -62,8 +23,6 @@ class VideoCompressorViewSet(CreateViewSet):
     """
     Вьюсет сервиса для сжатия видеофайлов.
 
-    Параметры
-    ---------
     input_file: file
         Полученый для сжатия видеофайл
     key: string
@@ -82,7 +41,7 @@ class VideoCompressorViewSet(CreateViewSet):
         вознкновения ошибок возвращает ошибки и 400 статус код
     2. Отправляем файл в функцию для сжатия
     3. Если сжатие не удалось оповещаем о неудаче
-    4. В случае успеха кодируем файлы в base64
+    4. В случае успеха кодируем сжатый файл в base64
     5. Отправляем оригинал и сжатый файл в 1с, оповещаем об успехе
     """
 
