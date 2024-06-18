@@ -5,10 +5,9 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
 
 from .decoder import encode_file_to_base64
+from .logger import setup_logger
 from .processing import compress_video
 from .serializers import VideoCompressorSerializer
-from .logger import setup_logger
-
 
 logger = setup_logger("video_compressor", "video_compressor.log")
 URL_1C = os.environ.get("URL_1C")
